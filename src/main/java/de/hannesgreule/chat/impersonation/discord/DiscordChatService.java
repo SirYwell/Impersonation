@@ -25,6 +25,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 
+/**
+ * A <b>DiscordChatService</b> communicates between <a href="https://dialogflow.com/">Dialogflow</b>
+ * and <b>Discord</b>. It can be loaded from a {@linkplain JsonObject} which is
+ * formatted like:
+ * <pre>
+ *     <code>
+ *         {
+ *             "chat_service": de.hannesgreule.chat.impersonation.discord.DiscordChatService
+ *             "discord_token": "your discord token",
+ *             "dialogflow_project": "your dialogflow project id",
+ *             "google_credentials": "the path to a credentials file"
+ *         }
+ *     </code>
+ * </pre>
+ *
+ * @author Hannes Greule
+ */
 @SuppressWarnings("unused")
 public class DiscordChatService extends ListenerAdapter implements ChatService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordChatService.class);
