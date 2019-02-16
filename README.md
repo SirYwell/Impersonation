@@ -1,5 +1,7 @@
 # Impersonation
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0da2c0a46dcb4c8e9f240366a46351a8)](https://app.codacy.com/app/hannesgreule/Impersonation?utm_source=github.com&utm_medium=referral&utm_content=SirYwell/Impersonation&utm_campaign=Badge_Grade_Dashboard)
+
 This project is for simple interactions between a chat service like Discord
 and [Dialogflow](https://dialogflow.com). It supports multiple bot instances 
 using a own thread per instance.
