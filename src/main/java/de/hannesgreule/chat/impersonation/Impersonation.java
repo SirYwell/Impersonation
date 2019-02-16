@@ -3,22 +3,38 @@ package de.hannesgreule.chat.impersonation;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 
 public class Impersonation {
+    private final File configFile;
 
-    public static void main(String[] args) {
-        var impersonation = new Impersonation();
-        impersonation.start();
+    public Impersonation(String configFile) {
+        String complete = configFile.endsWith(".json") ? configFile : configFile + ".json";
+        this.configFile = new File(complete);
     }
 
-    private void start() {
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            System.err.println("No config file given!");
+        }
+        var impersonation = new Impersonation(args[0]);
+        try {
+            impersonation.start();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void start() throws FileNotFoundException {
         loadChatServices();
     }
 
-    private void loadChatServices() {
+    private void loadChatServices() throws FileNotFoundException {
         var registry = ChatServiceRegistry.getInstance();
-        var stream = getClass().getResourceAsStream("/config.json");
+        var stream = new FileInputStream(configFile);
         var object = new JsonParser().parse(new InputStreamReader(stream)).getAsJsonObject();
         var bots = object.get("bots").getAsJsonArray();
         for (JsonElement element : bots) {
