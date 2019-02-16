@@ -1,11 +1,10 @@
 package de.hannesgreule.chat.impersonation.discord;
 
-import de.hannesgreule.chat.impersonation.ChatServiceContext;
-import de.hannesgreule.chat.impersonation.TimeUtil;
+import de.hannesgreule.chat.impersonation.DelayedAnswerContext;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * The context for discord channels.
@@ -15,10 +14,9 @@ import java.util.TimerTask;
  *
  * @version 1.0.0
  */
-public class DiscordChatServiceContext implements ChatServiceContext {
-    private MessageChannel channel;
-    private long coolDown;
-    private Timer timer = new Timer();
+public class DiscordChatServiceContext extends DelayedAnswerContext<MessageChannel> {
+    private static final Consumer<MessageChannel> SEND_TYPING = c -> c.sendTyping().queue();
+    private static final BiConsumer<MessageChannel, String> SEND_MESSAGE = (c, s) -> c.sendMessage(s).queue();
 
     /**
      * Create a new instance of the {@link DiscordChatServiceContext}
@@ -27,30 +25,11 @@ public class DiscordChatServiceContext implements ChatServiceContext {
      * @param channel the channel to send the response to.
      */
     public DiscordChatServiceContext(MessageChannel channel) {
-        this.channel = channel;
+        super(SEND_TYPING, SEND_MESSAGE, channel);
     }
 
     @Override
     public boolean sendMessage(String response) {
-        if (response == null || response.isEmpty() || coolDown > System.currentTimeMillis()) {
-            return false;
-        }
-        var typeTime = TimeUtil.calculateRandomizedTypeTime(response);
-        coolDown = (long) (System.currentTimeMillis() + typeTime * 1.5);
-        var randomDelay = (int) (Math.random() * 1250);
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                channel.sendTyping().queue();
-            }
-        }, randomDelay, 5000);
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                channel.sendMessage(response).queue();
-                timer.cancel();
-            }
-        }, typeTime + randomDelay);
-        return true;
+        return sendMessageDelayed(response);
     }
 }

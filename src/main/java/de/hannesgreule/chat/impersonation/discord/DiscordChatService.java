@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import de.hannesgreule.chat.impersonation.ChatService;
 import de.hannesgreule.chat.impersonation.ChatServiceContext;
 import de.hannesgreule.chat.impersonation.DialogflowRequester;
+import de.hannesgreule.chat.impersonation.GoogleUtil;
 import de.hannesgreule.chat.impersonation.exception.ChatServiceCreationException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -38,45 +39,10 @@ public class DiscordChatService extends ListenerAdapter implements ChatService {
         this.requester = new DialogflowRequester(project, sessionsSettings);
     }
 
-    @SuppressWarnings("unused")
     public static ChatService fromJsonObject(JsonObject object) throws ChatServiceCreationException {
         var token = object.get("discord_token").getAsString();
         var project = object.get("dialogflow_project").getAsString();
-        if (!object.has("google_credentials")) {
-            throw new ChatServiceCreationException("Missing google_credentials.");
-        }
-        var credentials = object.get("google_credentials");
-        var factory = JacksonFactory.getDefaultInstance();
-        CredentialsProvider credentialsProvider;
-        if (object.get("google_credentials").isJsonPrimitive()) {
-            var filePath = object.get("google_credentials").getAsString();
-            try {
-                LOGGER.info("Trying to load file " + filePath);
-                var file = new File(filePath);
-                if (!file.exists()) {
-                    throw new ChatServiceCreationException("Credentials file not found in path " + file.getAbsolutePath());
-                }
-                var stream = new FileInputStream(file);
-                credentialsProvider = setupCredentials(stream);
-                LOGGER.info("Credentials found. Using now.");
-            } catch (IOException e) {
-                throw new ChatServiceCreationException("Credential problem", e);
-            }
-        } else {
-            throw new UnsupportedOperationException("Must be file path");
-        }
-        try {
-            return new DiscordChatService(token, project,
-                    SessionsSettings.newBuilder().setCredentialsProvider(credentialsProvider).build());
-        } catch (IOException e) {
-            throw new ChatServiceCreationException("Failed to create " + DiscordChatService.class.getName());
-        }
-    }
-
-    private static CredentialsProvider setupCredentials(InputStream stream) throws IOException {
-        var credentials = GoogleCredentials.fromStream(stream)
-                .createScoped(Collections.singleton("https://www.googleapis.com/auth/cloud-platform"));
-        return FixedCredentialsProvider.create(credentials);
+        return new DiscordChatService(token, project, GoogleUtil.createSettings(object));
     }
 
     @Override
