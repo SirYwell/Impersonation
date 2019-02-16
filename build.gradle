@@ -18,6 +18,7 @@ dependencies {
     compile 'com.google.cloud:google-cloud-storage:1.59.0'
     compile 'net.dv8tion:JDA:4.ALPHA.0_6'
     compile 'org.slf4j:slf4j-log4j12:1.7.25'
+    compile 'org.telegram:telegrambots:4.1.2'
 }
 
 task fatJar (type: Jar) {
