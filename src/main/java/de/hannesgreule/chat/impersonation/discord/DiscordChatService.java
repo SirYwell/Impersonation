@@ -1,9 +1,5 @@
 package de.hannesgreule.chat.impersonation.discord;
 
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.gax.core.CredentialsProvider;
-import com.google.api.gax.core.FixedCredentialsProvider;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.dialogflow.v2.SessionsSettings;
 import com.google.gson.JsonObject;
 import de.hannesgreule.chat.impersonation.ChatService;
@@ -20,11 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
 
 @SuppressWarnings("unused")
 public class DiscordChatService extends ListenerAdapter implements ChatService {
